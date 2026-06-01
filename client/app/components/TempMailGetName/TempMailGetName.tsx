@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import './TempMailGetName.scss'
+import { $host } from '@/app/http'
 
 const TempMailGetName = () => {
   const [email, setEmail] = useState('')
@@ -12,12 +13,16 @@ const TempMailGetName = () => {
     setIsLoading(true)
     setIsCopied(false)
     
+    let accessKey = localStorage.getItem('accessKey')
+
     try {
-      // Тут буде реальний fetch('https://mail-tmp.xyz/api/v1/tickets/generate')
-      await new Promise((resolve) => setTimeout(resolve, 1200)) // Імітуємо затримку мережі
+      if(!accessKey){
+        accessKey=Math.random().toString(36).substring(2, 10)
+        localStorage.setItem('accessKey', accessKey);
+      }
+      const res=await $host.post('tempEmail/create',{accessKey});
       
-      const randomString = Math.random().toString(36).substring(2, 10)
-      setEmail(`${randomString}@mail-tmp.xyz`)
+      setEmail(`${res.data.email}@mail-tmp.xyz`)
     } catch (error) {
       console.error("Помилка генерації адреси:", error)
     } finally {
