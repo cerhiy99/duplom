@@ -21,6 +21,8 @@ function sanitizeEmailContent(htmlContent) {
 }
 
 const server = new SMTPServer({
+  logger: true,
+  debug: true,
   secure: false, // Для порту 25 потік починається як plain text (інші сервери роблять STARTTLS автоматично)
   disabledCommands: ['AUTH'], // Нам не потрібна авторизація відправників, ми працюємо як відкритий шлюз на прийом
   size: 15 * 1024 * 1024, // Ліміт на розмір листа (наприклад, 15 МБ), захист від DoS-атак великими файлами
