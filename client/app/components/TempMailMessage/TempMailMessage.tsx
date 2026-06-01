@@ -16,6 +16,7 @@ const TempMailMessage = () => {
     try {
       const res = await $host.get('tempEmail/letters?accessKey=' + accessKey)
       if(res.data.data.length==letters.length) return;
+
       setLetters(res.data.data)
       
     } catch (error) {
@@ -24,9 +25,7 @@ const TempMailMessage = () => {
   };
 
   useEffect(() => {
-    setIsMailLoading(true)
-    fetchLetters().finally(() => setIsMailLoading(false))
-
+    
     const interval = setInterval(() => {
       fetchLetters()
     }, 3000)

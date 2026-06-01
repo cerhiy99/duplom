@@ -73,9 +73,9 @@ async function sanitizeEmailContent(htmlContent) {
         // Користувач завантажить її з нашого сервера, не розкриваючи свій IP стороннім ресурсам
         $img.attr('src', `https://mail-tmp.xyz/api/mail-images/${imgName}`);
         
-        // На випадок, якщо там був прописаний onerror для атаки
-        $img.attr('onerror', "this.style.display='none';");
-
+        // На випадок, якщо там був прописаний onerror або onload для атаки
+        $img.removeAttr('onerror');
+        $img.removeAttr('onload'); 
       } catch (downloadError) {
         console.error(`[MailShield] Не вдалося завантажити картинку: ${src}`);
         // Якщо картинку не вдалося скачати (404 або таймаут), видаляємо бітий тег або ставимо заглушку
