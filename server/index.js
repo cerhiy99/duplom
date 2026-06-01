@@ -8,6 +8,7 @@ const sequelize = require('./db.js');
 require('./models/models.js'); // Ініціалізація зв'язків моделей
 const router = require('./routes/index.js');
 const smtpServer = require('./smtp/server.js'); // Шлях до файлу твого SMTP-сервера, який ми розбирали
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 4444;
