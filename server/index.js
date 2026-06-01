@@ -3,17 +3,16 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const fileUpload = require('express-fileupload');
+const path = require('path');
 
 const sequelize = require('./db.js');
 require('./models/models.js'); // Ініціалізація зв'язків моделей
 const router = require('./routes/index.js');
-const smtpServer = require('./smtp/server.js'); // Шлях до файлу твого SMTP-сервера, який ми розбирали
-const path = require('path');
+const smtpServer = require('./smtp/server.js');
 
 const app = express();
 const PORT = process.env.PORT || 4444;
 
-// Дозволяє Express коректно зчитувати реальні IP користувачів за Nginx-проксі
 // --- НАЛАШТУВАННЯ БЕЗПЕКИ ТА ПРОКСІ ---
 app.set('trust proxy', true); 
 
@@ -28,12 +27,17 @@ app.use(helmet({
 }));
 
 app.use(cors({
-  origin: true, // Дозволяє запити з будь-якого origin (або можеш прописати свій домен фронтенду)
+  origin: true, 
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// КРИТИЧНО ВАЖЛИВО: читання JSON, який шле Axios/Fetch
+app.use(express.json()); 
+app.use(fileUpload({}));
+
+// Роздача статичних картинок пошти з папки public
 app.use('/api/mail-images', express.static(path.join(__dirname, 'public'), {
   setHeaders: (res, path, stat) => {
     res.set('Access-Control-Allow-Origin', '*');
@@ -41,20 +45,19 @@ app.use('/api/mail-images', express.static(path.join(__dirname, 'public'), {
   }
 }));
 
-app.use('/api/uploads', express.static(path.join(__dirname, 'public')));
-
+// Основний роутер для API
 app.use('/api', router);
 
-
 // --- МІДЛВАР ОБРОБКИ ПОМИЛОК (Кібербезпека) ---
-// Захищає сервер від падіння та не зливає зловмисникам внутрішню структуру коду
 app.use((err, req, res, next) => {
-  console.error(`[SERVER ERROR] ${err.message}`);
+  // Цей лог залізобетонно виведе реальну причину 500 помилки в термінал VPS!
+  console.error(`[SERVER ERROR] ${err.stack || err.message}`);
+  
   res.status(err.status || 500).json({
     success: false,
     message: process.env.NODE_ENV === 'production' 
       ? 'Внутрішня помилка сервера безпеки' 
-      : err.message
+      : err.message // В дев-режимі покаже помилку на фронтенді
   });
 });
 
