@@ -1,19 +1,114 @@
 @import '../../globals.scss';
 
-.header-container{
-    @include responsive-width;
+// Наші темні змінні (якщо вони вже є в globals, воно підтягнеться)
+$dark-bg: #0d1117;
+$border-color: #30363d;
+$text-light: #c9d1d9;
+$text-muted: #8b949e;
+$accent-green: #238636;
+
+.header-wrapper {
+  width: 100%;
+  background-color: rgba(13, 17, 23, 0.8); // Ефект напівпрозорості
+  backdrop-filter: blur(12px); // Розмиття заднього плану (glassmorphism)
+  border-bottom: 1px solid $border-color;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-container {
+  @include responsive-width; // Твій міксин для обмеження ширини (наприклад, max-width: 1200px)
+  display: flex;
+  align-items: center;
+  justify-content: space-between; // Розштовхує ліву, середню та праву частини
+  height: 70px;
+  padding: 0 20px;
+  margin: 0 auto;
+
+  .header-left {
     display: flex;
     align-items: center;
-    justify-content: center;
-    height: 60px;
-    a{
-        text-decoration: none;
-        color: #fff;
-        font-size: 20px;
-        background-color: #000000;
-        height: 100%;
-        padding: 0 20px;
-        display: flex;
-        align-items: center;
+    cursor: pointer;
+    
+    a {
+      text-decoration: none;
     }
+  }
+
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
+
+    .nav-link {
+      text-decoration: none;
+      color: $text-muted;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        color: $text-light;
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      &.active {
+        color: #fff;
+        background-color: rgba(35, 134, 54, 0.15); // Слабке зелене підсвічування активного пункту
+        border: 1px solid rgba(35, 134, 54, 0.3);
+      }
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #161b22;
+      border: 1px solid $border-color;
+      padding: 6px 14px;
+      border-radius: 20px;
+      
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #2ea043; // Зелений вогник статусу
+        border-radius: 50%;
+        box-shadow: 0 0 8px #2ea043;
+        animation: pulse 2s infinite;
+      }
+
+      .status-text {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: $text-light;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+}
+
+// Анімація пульсації для індикатора активності сервера
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(46, 160, 67, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(46, 160, 67, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(46, 160, 67, 0);
+  }
 }
