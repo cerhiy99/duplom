@@ -64,7 +64,7 @@ class TempEmail {
   static GetLetters=async(req,res,next)=>{
     try{
         const {accessKey}=req.query;
-        const result=await Email.findOne({where:{accessKey}});
+        const result=await Email.findAll({where:{accessKey}});
         return res.json({data:result});
     }catch(err){
         console.log("Помилка отримання листів", err);

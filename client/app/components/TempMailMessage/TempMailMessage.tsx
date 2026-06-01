@@ -38,7 +38,6 @@ const TempMailMessage = () => {
     <div className='temp-mail-message-container'>
       <div className='mailbox-wrapper'>
         
-        {/* Ліва панель: Список листів */}
         <div className='letters-list-panel'>
           <div className='panel-header'>
             <h3>Вхідні листи</h3>
@@ -81,7 +80,6 @@ const TempMailMessage = () => {
           </div>
         </div>
 
-        {/* Права панель: Вміст обраного листа */}
         <div className='letter-content-panel'>
           {selectedLetter ? (
             <div className='full-letter'>
@@ -93,7 +91,6 @@ const TempMailMessage = () => {
                 </div>
               </div>
               
-              {/* Рендеримо HTML, який пройшов очищення на нашому бекенді */}
               <div 
                 className='letter-body-html'
                 dangerouslySetInnerHTML={{ __html: selectedLetter.message }}
