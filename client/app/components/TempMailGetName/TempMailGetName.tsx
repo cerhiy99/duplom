@@ -8,7 +8,6 @@ const TempMailGetName = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
 
-  // Імітація запиту до нашого бекенду (Node.js API на порту 4444 через Nginx proxy /api)
   const generateNewEmail = async () => {
     setIsLoading(true)
     setIsCopied(false)
@@ -33,12 +32,11 @@ const TempMailGetName = () => {
     generateNewEmail()
   }, [])
 
-  // Функція копіювання адреси в буфер обміну
   const copyToClipboard = () => {
     if (!email || isLoading) return
     navigator.clipboard.writeText(email)
     setIsCopied(true)
-    setTimeout(() => setIsCopied(false), 2000) // Повертаємо текст кнопки назад через 2 сек
+    setTimeout(() => setIsCopied(false), 2000)
   }
 
   return (

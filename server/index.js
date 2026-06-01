@@ -43,6 +43,9 @@ app.use('/api/mail-images', express.static(path.join(__dirname, 'public'), {
 
 app.use('/api/uploads', express.static(path.join(__dirname, 'public')));
 
+app.use('/api', router);
+
+
 // --- МІДЛВАР ОБРОБКИ ПОМИЛОК (Кібербезпека) ---
 // Захищає сервер від падіння та не зливає зловмисникам внутрішню структуру коду
 app.use((err, req, res, next) => {
