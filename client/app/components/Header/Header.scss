@@ -95,6 +95,20 @@ $accent-green: #238636;
       }
     }
   }
+  @media (max-width:768px) {
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    .header-nav{
+        padding: 0;
+    }
+    .header-left{
+        display: none;
+    }
+    .header-right{
+        display: none;
+    }
+  }
 }
 
 // Анімація пульсації для індикатора активності сервера
