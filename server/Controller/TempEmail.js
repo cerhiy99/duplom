@@ -54,10 +54,24 @@ class TempEmail {
       });
 
     } catch (err) {
+      console.error('Помилка створення тимчасової пошти:', err);
       return res.status(500).json({
         success: false,
         message: `Помилка створення тимчасової пошти: ${err.message}`
       });
+    }
+  }
+  static GetLetters=async(req,res,next)=>{
+    try{
+        const {accessKey}=req.query;
+        const result=await Email.findOne({where:{accessKey}});
+        return res.json({data:result});
+    }catch(err){
+        console.log("Помилка отримання листів", err);
+        return res.status(500).json({
+            success: false,
+            message: `Помилка отримання листів: ${err.message}`
+        });
     }
   }
 }

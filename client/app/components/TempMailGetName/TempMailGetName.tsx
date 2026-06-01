@@ -13,18 +13,17 @@ const TempMailGetName = () => {
     setIsLoading(true)
     setIsCopied(false)
     
-    let accessKey = localStorage.getItem('accessKey')
 
     try {
-      if(!accessKey){
-        accessKey=Math.random().toString(36).substring(2, 10)
-        localStorage.setItem('accessKey', accessKey);
-      }
+      let accessKey=Math.random().toString(36).substring(2, 10)
+      localStorage.setItem('accessKey', accessKey);
+    
       const res=await $host.post('tempEmail/create',{accessKey});
       
-      setEmail(`${res.data.email}@mail-tmp.xyz`)
+      setEmail(res.data.email)
     } catch (error) {
       console.error("Помилка генерації адреси:", error)
+      alert('Помилка генерації адреси. Спробуйте ще раз.')
     } finally {
       setIsLoading(false)
     }

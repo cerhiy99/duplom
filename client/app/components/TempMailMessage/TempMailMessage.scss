@@ -1,0 +1,338 @@
+@import '../../globals.scss';
+
+// Локальні змінні для кібербезпечного Dark Aesthetic (якщо їх немає в globals)
+$dark-bg: #0d1117;
+$panel-bg: #161b22;
+$border-color: #30363d;
+$accent-green: #238636;
+$accent-green-hover: #2ea043;
+$text-light: #c9d1d9;
+$text-muted: #8b949e;
+$warning-orange: #d29922;
+
+.temp-mail-message-container {
+  width: 100%;
+  @include responsive-width; // Твій глобальний міксин для max-width
+  margin: 30px auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+
+  .mailbox-wrapper {
+    display: grid;
+    grid-template-columns: 350px 1fr; // Ліва панель фіксована, права — адаптивна
+    background-color: $panel-bg;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    height: 650px;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+
+    // Адаптивність для планшетів та мобільних
+    @media (max-width: 820px) {
+      grid-template-columns: 1fr;
+      height: auto;
+      min-height: 500px;
+    }
+  }
+
+  // --- ЛІВА ПАНЕЛЬ: СПИСОК ВХІДНИХ ---
+  .letters-list-panel {
+    border-right: 1px solid $border-color;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.15);
+
+    @media (max-width: 820px) {
+      border-right: none;
+      border-bottom: 1px solid $border-color;
+      height: 300px;
+    }
+
+    .panel-header {
+      padding: 20px;
+      border-bottom: 1px solid $border-color;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.05);
+
+      h3 {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #fff;
+        margin: 0;
+        letter-spacing: 0.5px;
+      }
+
+      .badge {
+        background-color: $accent-green;
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 2px 10px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(35, 134, 54, 0.3);
+      }
+    }
+
+    .letters-scroller {
+      flex: 1;
+      overflow-y: auto;
+      
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: #21262d;
+        border-radius: 4px;
+      }
+      &::-webkit-scrollbar-thumb:hover {
+        background: $border-color;
+      }
+    }
+
+    .empty-mailbox {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 40px;
+      text-align: center;
+      color: $text-muted;
+
+      .animated-envelope {
+        font-size: 2.8rem;
+        margin-bottom: 15px;
+        animation: floatEnvelope 3s ease-in-out infinite;
+      }
+
+      p {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 0 0 6px 0;
+        color: $text-light;
+      }
+
+      span.sub {
+        font-size: 0.75rem;
+        opacity: 0.7;
+      }
+    }
+
+    .letter-item {
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(48, 54, 61, 0.4);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.02);
+      }
+
+      &.active {
+        background-color: rgba(35, 134, 54, 0.08);
+        
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 4px;
+          background-color: $accent-green;
+        }
+      }
+
+      .letter-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+
+        .sender {
+          font-weight: 600;
+          font-size: 0.9rem;
+          color: #fff;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 200px;
+        }
+
+        .time {
+          font-size: 0.75rem;
+          color: $text-muted;
+          font-variant-numeric: tabular-nums; // Рівні відступи для цифр часу
+        }
+      }
+
+      .subject {
+        font-size: 0.85rem;
+        color: $text-light;
+        font-weight: 500;
+        margin-bottom: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .preview-text {
+        font-size: 0.8rem;
+        color: $text-muted;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  // --- ПРАВА ПАНЕЛЬ: ВМІСТ ЛИСТА ---
+  .letter-content-panel {
+    background-color: $dark-bg;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #21262d;
+    }
+
+    .no-letter-selected {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 350px;
+      color: $text-muted;
+      text-align: center;
+      padding: 40px;
+      box-sizing: border-box;
+
+      .shield-watermark {
+        font-size: 4.5rem;
+        opacity: 0.12;
+        margin-bottom: 20px;
+        filter: drop-shadow(0 0 15px rgba(35, 134, 54, 0.4));
+      }
+
+      p {
+        font-size: 1rem;
+        color: $text-light;
+        margin: 0 0 8px 0;
+        font-weight: 500;
+      }
+
+      span {
+        font-size: 0.8rem;
+        max-width: 380px;
+        line-height: 1.4;
+      }
+    }
+
+    .full-letter {
+      padding: 35px;
+      animation: fadeIn 0.3s ease-in-out;
+
+      @media (max-width: 480px) {
+        padding: 20px;
+      }
+
+      .letter-header {
+        border-bottom: 1px solid $border-color;
+        padding-bottom: 22px;
+        margin-bottom: 25px;
+
+        h2 {
+          color: #fff;
+          font-size: 1.4rem;
+          margin: 0 0 16px 0;
+          line-height: 1.3;
+        }
+
+        .info-row {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          font-size: 0.85rem;
+          color: $text-muted;
+          background-color: rgba(255, 255, 255, 0.02);
+          padding: 12px 16px;
+          border-radius: 6px;
+          border: 1px solid rgba(48, 54, 61, 0.3);
+          
+          strong {
+            color: $text-light;
+            font-weight: 600;
+          }
+        }
+      }
+
+      .letter-body-html {
+        color: #e6edf3;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        word-break: break-word;
+
+        // Стилізація кастомних HTML-коментарів безпеки, які бекенд вставляє замість трекерів
+        span[style*="color"], font, div {
+          max-width: 100% !important;
+        }
+
+        // Обробка блокованих логів MailShield
+        iframe, script {
+          display: none !important;
+        }
+      }
+    }
+  }
+}
+
+// --- КІБЕРБЕЗПЕКОВІ АНІМАЦІЇ ---
+@keyframes floatEnvelope {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.05);
+    filter: drop-shadow(0 4px 12px rgba(35, 134, 54, 0.2));
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Спінер завантаження
+.mini-spinner {
+  width: 26px;
+  height: 26px;
+  border: 2.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  border-top-color: $accent-green;
+  animation: spinLoader 0.8s linear infinite;
+}
+
+@keyframes spinLoader {
+  to {
+    transform: rotate(360deg);
+  }
+}
