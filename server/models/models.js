@@ -25,8 +25,7 @@ const Email = sequelize.define('Email', {
 
 const Letter = sequelize.define('Letter', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  message: { type: DataTypes.TEXT, allowNull: false },
-  subject: { type: DataTypes.STRING, allowNull: false },
+  message: { type: DataTypes.TEXT('long'), allowNull: false },  subject: { type: DataTypes.STRING, allowNull: false },
   from: { type: DataTypes.STRING, allowNull: false },
   emailId: { type: DataTypes.INTEGER, allowNull: false },
 });
