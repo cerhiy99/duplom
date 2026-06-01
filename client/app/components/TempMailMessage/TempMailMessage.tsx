@@ -16,8 +16,7 @@ const TempMailMessage = () => {
     try {
       const res = await $host.get('tempEmail/letters?accessKey=' + accessKey)
       if(res.data.data.length==letters.length) return;
-
-      setLetters(res.data.data)
+      else setLetters(res.data.data)
       
     } catch (error) {
       console.error("Помилка при отриманні листів:", error)

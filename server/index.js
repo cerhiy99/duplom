@@ -13,19 +13,34 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 4444;
 
-// --- НАЛАШТУВАННЯ БЕЗПЕКИ ТА ПРОКСІ ---
 // Дозволяє Express коректно зчитувати реальні IP користувачів за Nginx-проксі
+// --- НАЛАШТУВАННЯ БЕЗПЕКИ ТА ПРОКСІ ---
 app.set('trust proxy', true); 
 
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
-app.use(fileUpload({}));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }, 
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https://mail-tmp.xyz", "http://localhost:3000"], 
+    },
+  },
+}));
 
-app.use('/api', router); 
+app.use(cors({
+  origin: true, // Дозволяє запити з будь-якого origin (або можеш прописати свій домен фронтенду)
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-//повренення раніше проксійованих картинок.
-app.use('/api/mail-images', express.static(path.join(__dirname, 'public')));
+app.use('/api/mail-images', express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res, path, stat) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+}));
+
 app.use('/api/uploads', express.static(path.join(__dirname, 'public')));
 
 // --- МІДЛВАР ОБРОБКИ ПОМИЛОК (Кібербезпека) ---

@@ -23,7 +23,6 @@ const TempMailGetName = () => {
       setEmail(res.data.email)
     } catch (error) {
       console.error("Помилка генерації адреси:", error)
-      alert('Помилка генерації адреси. Спробуйте ще раз.')
     } finally {
       setIsLoading(false)
     }
