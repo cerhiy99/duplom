@@ -1,0 +1,168 @@
+@import '../globals.scss';
+
+$dark-bg: #0d1117;
+$panel-bg: #161b22;
+$border-color: #30363d;
+$accent-green: #238636;
+$accent-green-hover: #2ea043;
+$text-light: #c9d1d9;
+$text-muted: #8b949e;
+
+.cabinet-container {
+  width: 100%;
+  background-color: $dark-bg;
+  min-height: calc(100vh - 70px);
+  padding: 20px;
+  box-sizing: border-box;
+
+  .cabinet-grid-layout {
+    display: grid;
+    grid-template-columns: 320px 320px 1fr; // 3-панельна архітектура
+    background-color: $panel-bg;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    height: calc(100vh - 110px);
+    min-height: 550px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 280px 280px 1fr;
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr; // на мобілках стає в один стовпчик
+      height: auto;
+    }
+  }
+
+  // Глобальні стилі для заголовків секцій всередині панелей
+  .panel-section-title {
+    padding: 20px;
+    border-bottom: 1px solid $border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.1);
+
+    h3 { margin: 0; font-size: 1rem; color: #fff; font-weight: 600; }
+    .alias-count-badge { background: $accent-green; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; color: #fff; }
+  }
+
+  // --- ПАНЕЛЬ 1: АЛІАСИ ---
+  .alias-management-panel {
+    border-right: 1px solid $border-color;
+    display: flex;
+    flex-direction: column;
+
+    .create-alias-form {
+      padding: 15px;
+      border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+      background-color: rgba(0, 0, 0, 0.05);
+
+      .alias-input-wrapper {
+        display: flex;
+        align-items: center;
+        background-color: #0d1117;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        padding: 2px 10px;
+        
+        input { background: none; border: none; outline: none; padding: 10px 4px; color: #fff; font-size: 0.85rem; flex: 1; min-width: 0; }
+        .domain-label { color: $text-muted; font-size: 0.8rem; font-weight: 500; }
+      }
+
+      .input-error-msg { color: #ff7b72; font-size: 0.75rem; margin-top: 6px; display: block; }
+
+      .create-alias-btn {
+        width: 100%; margin-top: 10px; background-color: $accent-green; border: none; outline: none; border-radius: 6px; padding: 10px;
+        color: #fff; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: background 0.2s;
+        &:hover { background: $accent-green-hover; }
+      }
+    }
+
+    .alias-list-scroller {
+      flex: 1; overflow-y: auto;
+      &::-webkit-scrollbar { width: 4px; }
+      &::-webkit-scrollbar-thumb { background: #21262d; }
+      color: #fff;
+      .no-aliases-blank{
+        padding-left: 20px;
+        box-sizing: border-box;
+      }
+    }
+
+    .alias-list-item {
+      padding: 14px 15px; border-bottom: 1px solid rgba(48, 54, 61, 0.3); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s;
+      &:hover { background-color: rgba(255, 255, 255, 0.02); }
+      &.active { background-color: rgba(35, 134, 54, 0.08); border-left: 3px solid $accent-green; padding-left: 12px; }
+
+      .alias-info {
+        display: flex; flex-direction: column; gap: 4px; min-width: 0;
+        .alias-email-text { color: $text-light; font-size: 0.85rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .alias-type-tag { font-size: 0.7rem; color: #58a6ff; font-weight: 600; text-transform: uppercase; }
+      }
+
+      .delete-alias-icon-btn {
+        background: none; border: none; outline: none; cursor: pointer; opacity: 0; transition: opacity 0.2s; padding: 6px;
+        &:hover { transform: scale(1.1); }
+      }
+      &:hover { .delete-alias-icon-btn { opacity: 0.6; &:hover { opacity: 1; } } }
+    }
+  }
+
+  // --- ПАНЕЛЬ 2: СПИСОК ЛИСТІВ ---
+  .cabinet-letters-list-panel {
+    border-right: 1px solid $border-color;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.08);
+
+    .cabinet-letters-scroller { flex: 1; overflow-y: auto; }
+    .select-alias-prompt { padding: 30px; text-align: center; color: $text-muted; font-size: 0.9rem; }
+    .cabinet-empty-mailbox { padding: 40px 20px; text-align: center; color: $text-muted; font-size: 0.85rem; }
+
+    .cabinet-letter-item {
+      padding: 16px 20px; border-bottom: 1px solid rgba(48, 54, 61, 0.4); cursor: pointer; transition: background 0.2s;
+      &:hover { background-color: rgba(255, 255, 255, 0.02); }
+      &.active { background-color: rgba(255, 255, 255, 0.03); border-right: 3px solid #58a6ff; }
+
+      .letter-top-row {
+        display: flex; justify-content: space-between; margin-bottom: 6px;
+        .sender-name { color: #fff; font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+        .letter-time-badge { color: $text-muted; font-size: 0.75rem; }
+      }
+      .letter-subject-line { color: $text-light; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    }
+  }
+
+  // --- ПАНЕЛЬ 3: ПЕРЕГЛЯД КОНТЕНТУ ---
+  .cabinet-letter-view-panel {
+    background-color: $dark-bg;
+    overflow-y: auto;
+
+    .cabinet-no-letter-placeholder {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: $text-muted;
+      .watermark-shield { font-size: 4rem; opacity: 0.1; margin-bottom: 15px; }
+      p { font-size: 0.9rem; margin: 0; }
+    }
+
+    .cabinet-full-letter-wrapper {
+      padding: 30px;
+      animation: cabFadeIn 0.2s ease-out;
+
+      .cabinet-letter-header {
+        border-bottom: 1px solid $border-color; padding-bottom: 20px; margin-bottom: 25px;
+        h2 { color: #fff; font-size: 1.3rem; margin: 0 0 12px 0; }
+        .sender-details { font-size: 0.8rem; color: $text-muted; p { margin: 4px 0; } strong { color: $text-light; } }
+      }
+
+      .cabinet-letter-body-html {
+        color: #e6edf3; font-size: 0.95rem; line-height: 1.6;
+        img { max-width: 100% !important; height: auto !important; object-fit: contain; }
+      }
+    }
+  }
+}
+
+@keyframes cabFadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }

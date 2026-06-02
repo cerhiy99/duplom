@@ -25,7 +25,7 @@ const LoginPage = () => {
 
     try {
       // Визначаємо ендпоінт залежно від режиму
-      const endpoint = isLoginMode ? 'user/login' : 'user/registration'
+      const endpoint = isLoginMode ? 'user/login' : 'user/register'
       
       const res = await $host.post(endpoint, { email, password })
 
