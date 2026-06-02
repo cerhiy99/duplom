@@ -8,6 +8,7 @@ interface Alias {
   id: number;
   email: string;
   type: string;
+  lettersCount?: number; // Додали поле підрахунку листів з бекенду
 }
 
 interface Letter {
@@ -29,7 +30,7 @@ const CabinetPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isMailLoading, setIsMailLoading] = useState(false)
 
-  // 1. Завантаження списку створених аліасів
+  // 1. Завантаження списку створених аліасів разом із кількістю листів
   const fetchAliases = async () => {
     try {
       const res = await $authHost.get('private/list')
@@ -45,14 +46,14 @@ const CabinetPage = () => {
     }
   }
 
-  // 2. Завантаження листів для конкретного обраного аліасу
+  // 2. Безпечне завантаження листів для конкретного обраного аліасу
   const fetchLetters = async (email: string) => {
     try {
-      // Використовуємо той самий ендпоінт, що й для тимчасової пошти,
-      // або твій кастомний для приватного кабінету
-      const res = await $authHost.post('tempEmail/letters', { accessKey: localStorage.getItem('token') })
+      // Передаємо email як query параметр (?email=...), метод GET, під захистом IsAuth Middleware
+      const res = await $authHost.get('private/letters', {
+        params: { email }
+      })
       if (res.data.success) {
-        // Фільтруємо листи суто для обраної зараз пошти
         setLetters(res.data.data) 
       }
     } catch (err) {
@@ -60,7 +61,7 @@ const CabinetPage = () => {
     }
   }
 
-  // 3. Створення нового кастомного аліасу
+  // 3. Створення нового постійного (reusable) аліасу
   const handleCreateAlias = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -70,8 +71,10 @@ const CabinetPage = () => {
     try {
       const res = await $authHost.post('private/create', { customName: newAliasName })
       if (res.data.success) {
-        setAliases([...aliases, res.data.data])
-        setSelectedAlias(res.data.data)
+        // Додаємо лічильник за замовчуванням для нового запису
+        const newAlias = { ...res.data.data, lettersCount: 0 }
+        setAliases([...aliases, newAlias])
+        setSelectedAlias(newAlias)
         setNewAliasName('')
       }
     } catch (err: any) {
@@ -81,10 +84,10 @@ const CabinetPage = () => {
     }
   }
 
-  // 4. Видалення аліасу (каскадно чистить і листи в БД)
+  // 4. Каскадне видалення аліасу та його листів
   const handleDeleteAlias = async (id: number, e: React.MouseEvent) => {
-    e.stopPropagation() // Щоб не тригерився клік вибору аліасу
-    if (!confirm('Ви впевнені, що хочете видалити цей аліас та всі його листи?')) return
+    e.stopPropagation() // Запобігаємо тригеру кліку на вибір самого аліасу
+    if (!confirm('Ви впевнені, що хочете видалити цей аліас та всі його листи з бази MariaDB?')) return
 
     try {
       const res = await $authHost.delete(`private/delete/${id}`)
@@ -102,12 +105,12 @@ const CabinetPage = () => {
     }
   }
 
-  // Первинне завантаження аліасів
+  // Первинне завантаження списку адрес
   useEffect(() => {
     fetchAliases()
   }, [])
 
-  // Моніторинг листів (Short Polling) при зміні обраного аліасу
+  // Асинхронний моніторинг повідомлень (Short Polling) при зміні обраної адреси
   useEffect(() => {
     if (!selectedAlias) return
     
@@ -118,6 +121,8 @@ const CabinetPage = () => {
 
     const interval = setInterval(() => {
       fetchLetters(selectedAlias.email)
+      // Оновлюємо також і лічильники листів у списку аліасів
+      fetchAliases()
     }, 5000)
 
     return () => clearInterval(interval)
@@ -134,7 +139,7 @@ const CabinetPage = () => {
             <span className='alias-count-badge'>{aliases.length}</span>
           </div>
 
-          {/* Форма створення нового аліасу */}
+          {/* Форма створення кастомного аліасу */}
           <form onSubmit={handleCreateAlias} className='create-alias-form'>
             <div className='alias-input-wrapper'>
               <input 
@@ -168,7 +173,10 @@ const CabinetPage = () => {
                 >
                   <div className='alias-info'>
                     <span className='alias-email-text'>{alias.email}</span>
-                    <span className='alias-type-tag'>{alias.type}</span>
+                    {/* Виводимо динамічну кількість листів, що повернув Sequelize */}
+                    <span className='alias-letters-count-badge'>
+                      ✉️ {alias.lettersCount || 0}
+                    </span>
                   </div>
                   <button 
                     onClick={(e) => handleDeleteAlias(alias.id, e)} 
@@ -245,4 +253,4 @@ const CabinetPage = () => {
   )
 }
 
-export default CabinetPage
+export default CabinetPage;

@@ -1,7 +1,7 @@
 const { Email, Letter } = require('../models/models.js');
+const { Sequelize } = require('../db.js'); // Переконайся, що шлях до екземпляру sequelize правильний
 
 class PrivateEmailController {
-  // 1. Створення постійної кастомної адреси
   static create = async (req, res) => {
     try {
       const { customName } = req.body;
@@ -10,7 +10,6 @@ class PrivateEmailController {
         return res.status(400).json({ success: false, message: 'Вкажіть назву адреси' });
       }
 
-      // Валідація: дозволяємо тільки латинські літери, цифри, дефіси та крапки (кібербезпека)
       const validNameRegex = /^[a-zA-Z0-9.-]+$/;
       if (!validNameRegex.test(customName)) {
         return res.status(400).json({ 
@@ -21,19 +20,17 @@ class PrivateEmailController {
 
       const fullEmail = `${customName.toLowerCase()}@mail-tmp.xyz`;
 
-      // Перевірка на унікальність аліасу в MariaDB
       const existing = await Email.findOne({ where: { email: fullEmail } });
       if (existing) {
         return res.status(409).json({ success: false, message: 'Ця поштова адреса вже зайнята' });
       }
 
-      // Створення кастомної адреси без обмеження часу життя (timeDelete: null)
       const newEmail = await Email.create({
         email: fullEmail,
-        userId: req.user.id, // Прив'язка до id з розкодованого JWT-токена через IsAuthMiddleware
+        userId: req.user.id, 
         type: 'reusable',
         timeDelete: null,
-        accessKey:'userLogin'
+        accessKey: 'userLogin'
       });
 
       return res.status(201).json({ success: true, data: newEmail });
@@ -43,10 +40,25 @@ class PrivateEmailController {
     }
   }
 
-  // 2. Отримання списку адрес поточного користувача
   static getAll = async (req, res) => {
     try {
-      const emails = await Email.findAll({ where: { userId: req.user.id } });
+      const emails = await Email.findAll({
+        where: { userId: req.user.id },
+        attributes: {
+          include: [
+            [
+              Sequelize.fn('COUNT', Sequelize.col('Letters.id')), 
+              'lettersCount'
+            ]
+          ]
+        },
+        include: [{
+          model: Letter,
+          attributes: [] 
+        }],
+        group: ['Email.id']
+      });
+
       return res.status(200).json({ success: true, data: emails });
     } catch (err) {
       console.error(`❌ [PrivateEmailController.getAll ERROR]: ${err.stack || err.message}`);
@@ -54,12 +66,10 @@ class PrivateEmailController {
     }
   }
 
-  // 3. Деактивація та каскадне видалення адреси
   static delete = async (req, res) => {
     try {
       const { id } = req.params;
 
-      // Видаляємо лише якщо аліас належить саме цьому користувачу (захист від атак типу IDOR)
       const deletedRows = await Email.destroy({ 
         where: { 
           id: id, 
@@ -67,7 +77,6 @@ class PrivateEmailController {
         } 
       });
 
-      // Якщо жодного рядка не видалено, значить id не існує або він належить чужому юзеру
       if (deletedRows === 0) {
         return res.status(404).json({ success: false, message: 'Адресу не знайдено або доступ заборонено' });
       }
@@ -76,6 +85,44 @@ class PrivateEmailController {
     } catch (err) {
       console.error(`❌ [PrivateEmailController.delete ERROR]: ${err.stack || err.message}`);
       return res.status(500).json({ success: false, message: 'Внутрішня помилка сервера при видаленні адреси' });
+    }
+  }
+
+  static getMyLetters = async (req, res, next) => {
+    try {
+      const { email } = req.query;
+
+      if (!email) {
+        return res.status(400).json({ success: false, message: 'Параметр email є обов\'язковим' });
+      }
+
+      const targetEmailRecord = await Email.findOne({
+        where: {
+          email: email.toLowerCase(),
+          userId: req.user.id 
+        }
+      });
+
+      if (!targetEmailRecord) {
+        return res.status(403).json({ 
+          success: false, 
+          message: 'Доступ заборонено: поштова адреса не знайдена або не належить вашому акаунту' 
+        });
+      }
+
+      const letters = await Letter.findAll({
+        where: { emailId: targetEmailRecord.id },
+        order: [['createdAt', 'DESC']]
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: letters
+      });
+
+    } catch (err) {
+      console.error(`❌ [PrivateEmailController.getMyLetters ERROR]: ${err.stack || err.message}`);
+      return res.status(500).json({ success: false, message: 'Внутрішня помилка сервера при отриманні листів' });
     }
   }
 }
