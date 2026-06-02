@@ -1,3 +1,4 @@
+const PrivateEmailController = require('../Controller/PrivateEmailController');
 const IsAuthMidlware = require('../MiddleWare/IsAuthMidlware');
 
 const router=require('express')();
