@@ -94,21 +94,20 @@ const server = new SMTPServer({
   disabledCommands: ['AUTH'], // Нам не потрібна авторизація відправників, ми працюємо як відкритий шлюз на прийом
   size: 15 * 1024 * 1024, // Ліміт на розмір листа (наприклад, 15 МБ), захист від DoS-атак великими файлами
 
-  // Крок 1: Перевірка одержувача (валідація аліасу на льоту)
   onRcptTo(address, session, callback) {
     const targetEmail = address.address.toLowerCase();
 
-    // Шукаємо, чи є такий тимчасовий або постійний імейл у нашій базі даних 'duplom'
+    // Шукаємо, чи є такий тимчасовий або постійний імейл у нашій базі даних
     Email.findOne({ where: { email: targetEmail } })
       .then(foundEmail => {
         if (!foundEmail) {
-          // Якщо аліасу немає або час вийшов, відсікаємо з'єднання кодом 550 (User not found)
+          // Якщо аліасу немає або час вийшов, відсікаємо з'єднання кодом 550
           return callback(new Error('Requested mail address does not exist or expired'));
         }
         
         // Зберігаємо ID пошти в сесію, щоб не робити повторний запит на етапі збереження тіла
         session.emailId = foundEmail.id;
-        callback(); // Дозволяємо передачу листа далі
+        callback();
       })
       .catch(err => {
         console.error('SMTP RCPT TO Error:', err);

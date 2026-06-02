@@ -1,0 +1,230 @@
+@import '../globals.scss';
+
+$dark-bg: #0d1117;
+$panel-bg: #161b22;
+$border-color: #30363d;
+$accent-green: #238636;
+$accent-green-hover: #2ea043;
+$text-light: #c9d1d9;
+$text-muted: #8b949e;
+$danger-red: #f85149;
+
+.login-container {
+  width: 100%;
+  min-height: calc(100vh - 70px); // Займає всю висоту екрана мінус хедер
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $dark-bg;
+  padding: 20px;
+  box-sizing: border-box;
+
+  .login-card {
+    width: 100%;
+    max-width: 440px;
+    background-color: $panel-bg;
+    border: 1px solid $border-color;
+    border-radius: 16px;
+    padding: 40px 30px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    box-sizing: border-box;
+    animation: authFadeUp 0.4s ease-out;
+
+    @media (max-width: 480px) {
+      padding: 30px 20px;
+    }
+  }
+
+  // --- ХЕДЕР КАРТКИ АВТОРИЗАЦІЇ ---
+  .auth-shield-header {
+    text-align: center;
+    margin-bottom: 30px;
+
+    .shield-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 0 8px rgba(35, 134, 54, 0.3));
+    }
+
+    h2 {
+      color: #fff;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+      letter-spacing: 0.5px;
+    }
+
+    p {
+      color: $text-muted;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      margin: 0;
+    }
+  }
+
+  // --- ПЛАШКА ПОМИЛКИ СЕРВЕРА ---
+  .auth-error-badge {
+    background-color: rgba(248, 81, 73, 0.1);
+    border: 1px solid rgba(248, 81, 73, 0.4);
+    color: #ff7b72;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: shakeError 0.3s ease-in-out;
+  }
+
+  // --- ФОРМА ---
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .input-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      label {
+        color: $text-light;
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+
+      input {
+        background-color: #0d1117;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+        padding: 12px 16px;
+        color: #fff;
+        font-size: 0.95rem;
+        outline: none;
+        transition: all 0.2s ease-in-out;
+        width: 100%;
+        box-sizing: border-box;
+
+        &:focus {
+          border-color: $accent-green;
+          box-shadow: 0 0 0 3px rgba(35, 134, 54, 0.15);
+        }
+
+        &::placeholder {
+          color: #484f58;
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .auth-submit-btn {
+      background-color: $accent-green;
+      color: #fff;
+      border: none;
+      outline: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 48px;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+
+      &:hover:not(:disabled) {
+        background-color: $accent-green-hover;
+      }
+
+      &:active:not(:disabled) {
+        transform: scale(0.99);
+      }
+
+      &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  // --- ФУТЕР ПЕРЕМИКАННЯ РЕЖИМІВ ---
+  .auth-toggle-footer {
+    text-align: center;
+    margin-top: 25px;
+    border-top: 1px solid rgba(48, 54, 61, 0.5);
+    padding-top: 20px;
+
+    p {
+      color: $text-muted;
+      font-size: 0.85rem;
+      margin: 0 0 15px 0;
+
+      button {
+        background: none;
+        border: none;
+        outline: none;
+        color: #58a6ff;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0;
+        font-size: 0.85rem;
+        margin-left: 4px;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .back-to-home {
+      a {
+        text-decoration: none;
+        color: $text-muted;
+        font-size: 0.8rem;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: $text-light;
+        }
+      }
+    }
+  }
+}
+
+// --- АНІМАЦІЇ ЕФЕКТІВ ---
+@keyframes authFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.auth-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: authSpin 0.8s linear infinite;
+}
+
+@keyframes authSpin {
+  to { transform: rotate(360deg); }
+}
