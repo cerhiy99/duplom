@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 
 export const useAuth = () => {
-  const [token, setToken] = useState(null)
+  const [token, setToken] = useState<string|null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -11,7 +11,7 @@ export const useAuth = () => {
     setIsLoading(false)
   }, [])
 
-  const login = (newToken) => {
+  const login = (newToken:string) => {
     localStorage.setItem('token', newToken)
     setToken(newToken)
   }

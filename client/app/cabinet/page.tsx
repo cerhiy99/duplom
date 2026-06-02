@@ -46,13 +46,9 @@ const CabinetPage = () => {
     }
   }
 
-  // 2. Безпечне завантаження листів для конкретного обраного аліасу
   const fetchLetters = async (email: string) => {
     try {
-      // Передаємо email як query параметр (?email=...), метод GET, під захистом IsAuth Middleware
-      const res = await $authHost.get('private/letters', {
-        params: { email }
-      })
+      const res = await $authHost.get('private/getMyLetters?email='+email)
       if (res.data.success) {
         setLetters(res.data.data) 
       }
