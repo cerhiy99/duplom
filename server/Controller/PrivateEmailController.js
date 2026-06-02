@@ -31,8 +31,9 @@ class PrivateEmailController {
       const newEmail = await Email.create({
         email: fullEmail,
         userId: req.user.id, // Прив'язка до id з розкодованого JWT-токена через IsAuthMiddleware
-        type: 'custom',
-        timeDelete: null
+        type: 'reusable',
+        timeDelete: null,
+        accessKey:'userLogin'
       });
 
       return res.status(201).json({ success: true, data: newEmail });
